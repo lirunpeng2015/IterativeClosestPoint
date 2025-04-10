@@ -1,3 +1,6 @@
+# This script plots multiple point clouds onto one scatter plot
+
+
 import matplotlib.pyplot as plt
 import numpy as np
 
