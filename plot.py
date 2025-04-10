@@ -1,7 +1,22 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
-x = [1, 2, 3, 4, 5]
-y = [2, 4, 1, 3, 5]
+file = open('lidar-scans/lidar-box-scan.txt', 'r')
+
+file.readline()
+file.readline()
+file.readline()
+
+x = []
+y = []
+
+for i in range (0, 300):
+    line = file.readline()
+    numbers = line.split()
+    x.append(float(numbers[1]) * np.cos(float(numbers[0])))
+    y.append(float(numbers[1]) * np.sin(float(numbers[0])))
+
+
 
 plt.plot(x, y)
 plt.xlabel("X-axis")
