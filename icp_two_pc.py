@@ -183,4 +183,5 @@ x_aligned, y_aligned, R, t = icp_2d(x_ref, y_ref, x_src, y_src)
 #plt.scatter(x_ref, y_ref, color='blue')
 #plt.scatter(x_aligned, y_aligned, color='orange')
 
+plt.ioff()
 plt.show()
