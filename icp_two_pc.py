@@ -170,9 +170,6 @@ def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=1000, tolerance=1e-6):
             break
         prev_error = mean_error
 
-        
-
-
     # Final transformed source points
     x_aligned, y_aligned = src_points[:, 0].tolist(), src_points[:, 1].tolist()
 
