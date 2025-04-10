@@ -4,6 +4,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial import cKDTree
+import time
 
 # reference point cloud file
 ref_pc_file = open('lidar-scans/lidar-data-2.txt', 'r')
@@ -99,7 +100,15 @@ for i in range(len(x_src)):
 #------------------------------------#
 #     chatgpt alogorithm for ICP     #
 #------------------------------------#
+plt.ion()
 
+plt.xlabel("X-axis")
+plt.ylabel("Y-axis")
+plt.title("Lidar Point-Cloud plot")
+
+plt.scatter(x_ref, y_ref, color = 'blue')
+plt.scatter(x_src, y_src, color = 'red')
+plt.draw()
 
 def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=1000, tolerance=1e-6):
     # Convert input lists to numpy arrays
@@ -113,6 +122,7 @@ def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=1000, tolerance=1e-6):
     prev_error = float('inf')
 
     for i in range(max_iterations):
+
         # Step 1: Find closest points
         tree = cKDTree(ref_points)
         distances, indices = tree.query(src_points)
@@ -141,6 +151,15 @@ def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=1000, tolerance=1e-6):
         # Step 5: Apply transformation
         src_points = (R @ src_points.T).T + t.T
 
+        x_aligned, y_aligned = src_points[:, 0].tolist(), src_points[:, 1].tolist()
+
+        plt.clf()
+        plt.scatter(x_ref, y_ref, color='blue')
+        plt.scatter(x_aligned, y_aligned)
+        plt.draw()
+
+        plt.pause(0.05)
+
         # Accumulate transformation
         R_total = R @ R_total
         t_total = R @ t_total + t
@@ -151,6 +170,9 @@ def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=1000, tolerance=1e-6):
             break
         prev_error = mean_error
 
+        
+
+
     # Final transformed source points
     x_aligned, y_aligned = src_points[:, 0].tolist(), src_points[:, 1].tolist()
 
@@ -158,11 +180,7 @@ def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=1000, tolerance=1e-6):
 
 x_aligned, y_aligned, R, t = icp_2d(x_ref, y_ref, x_src, y_src)
 
-plt.scatter(x_ref, y_ref, color='blue')
-plt.scatter(x_src, y_src, color='red')
+#plt.scatter(x_ref, y_ref, color='blue')
 #plt.scatter(x_aligned, y_aligned, color='orange')
 
-plt.xlabel("X-axis")
-plt.ylabel("Y-axis")
-plt.title("Lidar Point-Cloud plot")
 plt.show()
