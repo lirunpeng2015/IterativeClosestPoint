@@ -18,7 +18,7 @@ for i in range (0, 300):
 
 
 
-plt.plot(x, y)
+plt.scatter(x, y)
 plt.xlabel("X-axis")
 plt.ylabel("Y-axis")
 plt.title("Simple Line Plot")
