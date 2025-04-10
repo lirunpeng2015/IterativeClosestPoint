@@ -34,6 +34,8 @@ for i in range (0, num_of_points):
            (float(numbers[1]) * (float(np.cos(float(numbers[0]))))), ' Y-value: ', (float(numbers[1]) * (float(np.sin(float(numbers[0]))))))
 
 
+file.close()
+
 plt.scatter(x, y)
 plt.xlabel("X-axis")
 plt.ylabel("Y-axis")
