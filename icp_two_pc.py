@@ -3,9 +3,10 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.spatial import cKDTree
 
 # reference point cloud file
-ref_pc_file = open('lidar-scans/lidar-data.txt', 'r')
+ref_pc_file = open('lidar-scans/lidar-data-2.txt', 'r')
 
 # source point cloud file
 src_pc_file = open('lidar-scans/lidar-data-3.txt', 'r')
@@ -95,10 +96,71 @@ for i in range(len(x_src)):
             smallest_distance_index = j
 
 
+#------------------------------------#
+#     chatgpt alogorithm for ICP     #
+#------------------------------------#
 
 
-plt.scatter(x_ref, y_ref)
-plt.scatter(x_src, y_src)
+def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=1000, tolerance=1e-6):
+    # Convert input lists to numpy arrays
+    ref_points = np.vstack((x_ref, y_ref)).T  # Shape (N, 2)
+    src_points = np.vstack((x_src, y_src)).T  # Shape (M, 2)
+
+    # Initialize transformation: rotation matrix R and translation vector t
+    R_total = np.eye(2)
+    t_total = np.zeros((2, 1))
+
+    prev_error = float('inf')
+
+    for i in range(max_iterations):
+        # Step 1: Find closest points
+        tree = cKDTree(ref_points)
+        distances, indices = tree.query(src_points)
+        closest_ref = ref_points[indices]
+
+        # Step 2: Compute centroids
+        centroid_src = np.mean(src_points, axis=0)
+        centroid_ref = np.mean(closest_ref, axis=0)
+
+        # Step 3: Subtract centroids
+        src_centered = src_points - centroid_src
+        ref_centered = closest_ref - centroid_ref
+
+        # Step 4: Compute optimal rotation using SVD
+        H = src_centered.T @ ref_centered
+        U, _, Vt = np.linalg.svd(H)
+        R = Vt.T @ U.T
+
+        # Ensure R is a proper rotation (det(R)=1)
+        if np.linalg.det(R) < 0:
+            Vt[1, :] *= -1
+            R = Vt.T @ U.T
+
+        t = centroid_ref.reshape(2, 1) - R @ centroid_src.reshape(2, 1)
+
+        # Step 5: Apply transformation
+        src_points = (R @ src_points.T).T + t.T
+
+        # Accumulate transformation
+        R_total = R @ R_total
+        t_total = R @ t_total + t
+
+        # Step 6: Check convergence
+        mean_error = np.mean(distances)
+        if np.abs(prev_error - mean_error) < tolerance:
+            break
+        prev_error = mean_error
+
+    # Final transformed source points
+    x_aligned, y_aligned = src_points[:, 0].tolist(), src_points[:, 1].tolist()
+
+    return x_aligned, y_aligned, R_total, t_total
+
+x_aligned, y_aligned, R, t = icp_2d(x_ref, y_ref, x_src, y_src)
+
+plt.scatter(x_ref, y_ref, color='blue')
+plt.scatter(x_src, y_src, color='red')
+#plt.scatter(x_aligned, y_aligned, color='orange')
 
 plt.xlabel("X-axis")
 plt.ylabel("Y-axis")
