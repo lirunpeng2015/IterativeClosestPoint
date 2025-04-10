@@ -21,12 +21,17 @@ file.readline()
 x = []
 y = []
 
-for i in range (0, 300):
+# convert angle + distance to (x,y) and add to lists
+for i in range (0, num_of_points):
     line = file.readline()
     numbers = line.split()
-    x.append(float(numbers[1]) * np.cos(float(numbers[0])))
-    y.append(float(numbers[1]) * np.sin(float(numbers[0])))
 
+    # np.cos/np.sin expects angle in radians
+    angle_rad = np.radians(float(numbers[0]))
+    x.append(float(numbers[1]) * np.cos(angle_rad))
+    y.append(float(numbers[1]) * np.sin(angle_rad))
+    print('Angle: ', numbers[0], ' Distance: ', numbers[1], ' X-value: ',
+           (float(numbers[1]) * (float(np.cos(float(numbers[0]))))), ' Y-value: ', (float(numbers[1]) * (float(np.sin(float(numbers[0]))))))
 
 
 plt.scatter(x, y)
