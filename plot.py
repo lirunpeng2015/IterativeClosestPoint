@@ -1,12 +1,23 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+# open the file containing the lidar scan data
+# change to the file which you want to plot
 file = open('lidar-scans/lidar-box-scan.txt', 'r')
 
-file.readline()
-file.readline()
+# skip the first line of file
 file.readline()
 
+# get the number of points contained in the file from the COUNT
+count_line = file.readline()
+count_line_split = count_line.split('=')
+num_of_points = int(count_line_split[1])
+# print('Number of points in file: ', num_of_points)
+
+# skip third line of file
+file.readline()
+
+# lists to contain x, y values
 x = []
 y = []
 
