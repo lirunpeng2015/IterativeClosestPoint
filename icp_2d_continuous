@@ -1,73 +1,128 @@
-# This script continuously performs ICP for point clouds
+# This script performs iterative closets point for any number of point clouds
 
 
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial import cKDTree
 import time
+import icp_helper as my_icp_
 
-x_ref = []
-y_ref = []
+num_of_files = 3
+
+file_path_1 = 'lidar-scans/lidar-floor-scan-1.txt'
+file_path_2 = 'lidar-scans/lidar-floor-scan-2.txt'
+file_path_3 = 'lidar-scans/lidar-floor-scan-3.txt'
+
+# returns cartesians coordinates as lists of x and y values from a lidar scan file
+def to_cartesian(file_path):
+
+    file = open(file_path, 'r')
+
+    file.readline()
+
+    count_line = file.readline()
+    count_line_split = count_line.split('=')
+    num_of_points = int(count_line_split[1])
+
+    file.readline()
+
+    x = []
+    y = []
+
+    for i in range (num_of_points):
+        line = file.readline()
+        numbers = line.split()
+        angle_rad = np.radians(float(numbers[0]))
+        x.append(float(numbers[1]) * np.cos(angle_rad))
+        y.append(float(numbers[1]) * np.sin(angle_rad))
+
+    file.close()
+
+    return x, y
+
+
+
+
+#-------------------------------------------------------#
+#     gather cartesian coordinates from source file     #
+#-------------------------------------------------------#
+
+
+# skip the first line of file
+src_pc_file.readline()
+
+# get the number of points contained in the file from the COUNT
+count_line = src_pc_file.readline()
+count_line_split = count_line.split('=')
+num_of_points = int(count_line_split[1])
+
+# skip third line of file
+src_pc_file.readline()
+
 x_src = []
 y_src = []
 
-file = open('lidar-scans/lidar-data.txt', 'r')
+# convert angle + distance to (x,y) and add to lists
+for i in range (num_of_points):
+    line = src_pc_file.readline()
+    numbers = line.split()
 
-# skip first line
-file.readline()
+    # np.cos/np.sin expects angle in radians
+    angle_rad = np.radians(float(numbers[0]))
+    x_src.append(float(numbers[1]) * np.cos(angle_rad))
+    y_src.append(float(numbers[1]) * np.sin(angle_rad))
 
-# get count of number of data points
-count_line = file.readline()
-count_words = count_line.split('=')
-count = count_words[1]
-
-# skip third line
-file.readline()
-
-# get first line of data
-first_line_of_data = file.readline()
-
-# returns true if the file has changed
-def file_updated():
-    temp_file = open('lidar-scans/lidar-data.txt', 'r')
-
-    temp_file.readline()
-    temp_file.readline()
-    temp_file.readline()
-
-    if first_line_of_data != temp_file.readline():
-        return True
-
-    return False
-
-def cartesian_points():
-    # convert angle + distance to (x,y) and add to lists
-    for i in range (count):
-        line = file.readline()
-        numbers = line.split()
-
-        # np.cos/np.sin expects angle in radians
-        angle_rad = np.radians(float(numbers[0]))
-        x_src.append(float(numbers[1]) * np.cos(angle_rad))
-        y_src.append(float(numbers[1]) * np.sin(angle_rad))
+src_pc_file.close()
 
 
+#--------------------------------------------------------------#
+#     calculate distances between each point in the src pc     #
+#--------------------------------------------------------------#
 
-#------------------------------------#
-#     chatgpt alogorithm for ICP     #
-#------------------------------------#
+
+# for i in range(len(x_src)):
+#     smallest_distance = -1
+
+#     for j in range(len(x_ref)):
+#         distance = np.sqrt(np.pow((x_src[i] - x_ref[j]), 2) + np.pow((y_src[i] - y_ref[j]), 2))
+
+#         if smallest_distance == -1:
+#             smallest_distance = distance
+#             smallest_distance_index = j
+
+#         elif smallest_distance > distance:
+#             smallest_distance = distance
+#             smallest_distance_index = j
 
 
-def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=1000, tolerance=1e-6):
+plt.ion()
+
+plt.xlabel("X-axis")
+plt.ylabel("Y-axis")
+plt.title("Lidar Point-Cloud plot")
+
+plt.scatter(x_ref, y_ref, color = 'blue')
+plt.scatter(x_src, y_src, color = 'red')
+plt.draw()
+
+
+#---------------------------------------#
+#           algorithm for ICP           #
+#---------------------------------------#
+
+
+def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=500, tolerance=1e-6):
+
     # Convert input lists to numpy arrays
     ref_points = np.vstack((x_ref, y_ref)).T  # Shape (N, 2)
+    print(ref_points)
     src_points = np.vstack((x_src, y_src)).T  # Shape (M, 2)
 
     # Initialize transformation: rotation matrix R and translation vector t
     R_total = np.eye(2)
     t_total = np.zeros((2, 1))
 
-    prev_error = float('inf')
+    prev_error = float(1)
 
     for i in range(max_iterations):
 
@@ -106,7 +161,7 @@ def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=1000, tolerance=1e-6):
         plt.scatter(x_aligned, y_aligned)
         plt.draw()
 
-        plt.pause(0.05)
+        plt.pause(0.5)
 
         # Accumulate transformation
         R_total = R @ R_total
@@ -123,25 +178,19 @@ def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=1000, tolerance=1e-6):
 
     return x_aligned, y_aligned, R_total, t_total
 
-while (True):
-    if file_updated():
-        file = open('lidar-scans/lidar-data.txt', 'r')
+x_aligned, y_aligned, R_total, t_total = icp_2d(x_ref, y_ref, x_src, y_src)
 
-        # skip first line
-        file.readline()
+x_ref = x_ref + x_aligned
+y_ref = y_ref + y_aligned
 
-        # get count of number of data points
-        count_line = file.readline()
-        count_words = count_line.split('=')
-        count = count_words[1]
+print(len(x_ref))
+print(len(y_ref))
 
-        # skip third line
-        file.readline()
+print(R_total)
+print(t_total)
 
-        # get first line of data
-        first_line_of_data = file.readline()
+#plt.scatter(x_ref, y_ref, color='blue')
+#plt.scatter(x_aligned, y_aligned, color='orange')
 
-
-
-        x_aligned, y_aligned, R, t = icp_2d(x_ref, y_ref, x_src, y_src)
-        
+plt.ioff()
+plt.show()
