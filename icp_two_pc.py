@@ -6,11 +6,11 @@ import numpy as np
 from scipy.spatial import cKDTree
 import time
 
-# reference point cloud file
-ref_pc_file = open('lidar-scans/lidar-data-2.txt', 'r')
+reference_file_path = 'lidar-scans/lidar-floor-scan-1.txt'
+source_file_path = 'lidar-scans/lidar-floor-scan-2.txt'
 
-# source point cloud file
-src_pc_file = open('lidar-scans/lidar-data-3.txt', 'r')
+ref_pc_file = open(reference_file_path, 'r')
+src_pc_file = open(source_file_path, 'r')
 
 
 #----------------------------------------------------------#
@@ -82,24 +82,21 @@ src_pc_file.close()
 #--------------------------------------------------------------#
 
 
-for i in range(len(x_src)):
-    smallest_distance = -1
+# for i in range(len(x_src)):
+#     smallest_distance = -1
 
-    for j in range(len(x_ref)):
-        distance = np.sqrt(np.pow((x_src[i] - x_ref[j]), 2) + np.pow((y_src[i] - y_ref[j]), 2))
+#     for j in range(len(x_ref)):
+#         distance = np.sqrt(np.pow((x_src[i] - x_ref[j]), 2) + np.pow((y_src[i] - y_ref[j]), 2))
 
-        if smallest_distance == -1:
-            smallest_distance = distance
-            smallest_distance_index = j
+#         if smallest_distance == -1:
+#             smallest_distance = distance
+#             smallest_distance_index = j
 
-        elif smallest_distance > distance:
-            smallest_distance = distance
-            smallest_distance_index = j
+#         elif smallest_distance > distance:
+#             smallest_distance = distance
+#             smallest_distance_index = j
 
 
-#------------------------------------#
-#     chatgpt alogorithm for ICP     #
-#------------------------------------#
 plt.ion()
 
 plt.xlabel("X-axis")
@@ -110,16 +107,24 @@ plt.scatter(x_ref, y_ref, color = 'blue')
 plt.scatter(x_src, y_src, color = 'red')
 plt.draw()
 
-def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=1000, tolerance=1e-6):
+
+#---------------------------------------#
+#           algorithm for ICP           #
+#---------------------------------------#
+
+
+def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=500, tolerance=1e-6):
+
     # Convert input lists to numpy arrays
     ref_points = np.vstack((x_ref, y_ref)).T  # Shape (N, 2)
+    print(ref_points)
     src_points = np.vstack((x_src, y_src)).T  # Shape (M, 2)
 
     # Initialize transformation: rotation matrix R and translation vector t
     R_total = np.eye(2)
     t_total = np.zeros((2, 1))
 
-    prev_error = float('inf')
+    prev_error = float(1)
 
     for i in range(max_iterations):
 
@@ -158,7 +163,7 @@ def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=1000, tolerance=1e-6):
         plt.scatter(x_aligned, y_aligned)
         plt.draw()
 
-        plt.pause(0.05)
+        plt.pause(0.5)
 
         # Accumulate transformation
         R_total = R @ R_total
@@ -175,7 +180,16 @@ def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=1000, tolerance=1e-6):
 
     return x_aligned, y_aligned, R_total, t_total
 
-x_aligned, y_aligned, R, t = icp_2d(x_ref, y_ref, x_src, y_src)
+x_aligned, y_aligned, R_total, t_total = icp_2d(x_ref, y_ref, x_src, y_src)
+
+x_ref = x_ref + x_aligned
+y_ref = y_ref + y_aligned
+
+print(len(x_ref))
+print(len(y_ref))
+
+print(R_total)
+print(t_total)
 
 #plt.scatter(x_ref, y_ref, color='blue')
 #plt.scatter(x_aligned, y_aligned, color='orange')
