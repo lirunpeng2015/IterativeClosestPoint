@@ -159,18 +159,5 @@ def process_lidar_files():
     plt.tight_layout()
     plt.show()
 
-    # Save final point cloud
-    with open('final_map.txt', 'w') as f:
-        for x, y in zip(global_map_x, global_map_y):
-            f.write(f"{x} {y}\n")
-
-    # Save poses
-    with open('poses.txt', 'w') as f:
-        for x, y, theta in poses:
-            f.write(f"{x} {y} {theta}\n")
-
-    print(f"Saved {len(global_map_x)} points to final map and {len(poses)} poses.")
-    print("Files 'final_map.txt' and 'poses.txt' created successfully.")
-
 if __name__ == "__main__":
     process_lidar_files()
