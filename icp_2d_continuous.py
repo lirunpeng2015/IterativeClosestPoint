@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial import cKDTree
 
-folder_path = 'lidar-scans/common-room'
+folder_path = 'lidar-scans/classroom'
 
 def to_cartesian(file_path):
     with open(file_path, 'r') as file:
