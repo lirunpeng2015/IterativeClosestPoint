@@ -28,6 +28,7 @@ def to_cartesian(file_path):
     return np.array(x), np.array(y)
 
 def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=100, tolerance=1e-6):
+    print(x_ref)
     ref_points = np.vstack((x_ref, y_ref)).T
     src_points = np.vstack((x_src, y_src)).T
 
@@ -106,7 +107,6 @@ def process_lidar_files():
     
     for i, file_name in enumerate(lidar_files[1:], start=1):
         file_path = os.path.join(folder_path, file_name)
-        print(f"Processing {file_name} ({i}/{len(lidar_files)-1})...")
 
         # Load next scan
         x_src, y_src = to_cartesian(file_path)
