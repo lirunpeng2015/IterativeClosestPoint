@@ -28,7 +28,6 @@ def to_cartesian(file_path):
     return np.array(x), np.array(y)
 
 def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=100, tolerance=1e-6):
-    print(x_ref)
     ref_points = np.vstack((x_ref, y_ref)).T
     src_points = np.vstack((x_src, y_src)).T
 
