@@ -6,9 +6,9 @@ import numpy as np
 
 num_of_data_files = 3
 
-file_path_1 = 'lidar-scans/lidar-data.txt'
-file_path_2 = 'lidar-scans/lidar-data-2.txt'
-file_path_3 = 'lidar-scans/lidar-data-3.txt'
+file_path_1 = 'lidar-scans/lidar-floor-scan-1.txt'
+file_path_2 = 'lidar-scans/lidar-floor-scan-2.txt'
+file_path_3 = 'lidar-scans/lidar-floor-scan-3.txt'
 
 for i in range(num_of_data_files):
 
