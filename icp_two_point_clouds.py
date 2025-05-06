@@ -6,8 +6,8 @@ import numpy as np
 from scipy.spatial import cKDTree
 import time
 
-reference_file_path = 'lidar-scans/lidar-floor-scan-1.txt'
-source_file_path = 'lidar-scans/lidar-floor-scan-2.txt'
+reference_file_path = 'lidar-scans/classroom/pos1-1.txt'
+source_file_path = 'lidar-scans/classroom/pos2-1.txt'
 
 ref_pc_file = open(reference_file_path, 'r')
 src_pc_file = open(source_file_path, 'r')
@@ -113,7 +113,7 @@ plt.draw()
 #---------------------------------------#
 
 
-def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=500, tolerance=1e-6):
+def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=100, tolerance=1e-6):
 
     # Convert input lists to numpy arrays
     ref_points = np.vstack((x_ref, y_ref)).T  # Shape (N, 2)
