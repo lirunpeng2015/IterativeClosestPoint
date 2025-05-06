@@ -19,5 +19,7 @@ These are the important files:
 4. icp_many_point_clouds.py: performs ICP with all files inside a subfolder of 'lidar-scans'. change line 6 to look at different groups of scans.
 
 The following files are ROS2 nodes inside the 'ros2-nodes' subfolder
-1. final-ros2-node.py: performs ICP for a stream of point clouds. To view: open rviz2, add a pointcloud2 stream to rviz, select the /scan
-2. 
+1. ros2_w_occupancy_grid.py: performs ICP for a stream of point clouds and publishes an occupancy grid.
+  To view: run the rplidar package for the C1. Close rviz2. In another terminal run the node. Open rviz2 in another terminal. Add a display for a map and change the topic to 'occupancy_grid'. Update topic should automatically get set to 'occupancy_grid_update'. Change it if not.
+
+The rest of the ros2 nodes all have problems and are left for documentation purposes.
