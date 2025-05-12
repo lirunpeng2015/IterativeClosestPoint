@@ -96,15 +96,15 @@ src_pc_file.close()
 #             smallest_distance = distance
 #             smallest_distance_index = j
 
-
+plt.style.use('dark_background')
 plt.ion()
 
 plt.xlabel("X-axis")
 plt.ylabel("Y-axis")
 plt.title("Lidar Point-Cloud plot")
 
-plt.scatter(x_ref, y_ref, color = 'blue')
-plt.scatter(x_src, y_src, color = 'red')
+plt.scatter(x_ref, y_ref, color = 'turquoise')
+plt.scatter(x_src, y_src,color = 'magenta')
 plt.draw()
 
 
@@ -113,7 +113,7 @@ plt.draw()
 #---------------------------------------#
 
 
-def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=100, tolerance=1e-6):
+def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=25, tolerance=1e-5):
 
     # Convert input lists to numpy arrays
     ref_points = np.vstack((x_ref, y_ref)).T  # Shape (N, 2)
@@ -159,8 +159,8 @@ def icp_2d(x_ref, y_ref, x_src, y_src, max_iterations=100, tolerance=1e-6):
         x_aligned, y_aligned = src_points[:, 0].tolist(), src_points[:, 1].tolist()
 
         plt.clf()
-        plt.scatter(x_ref, y_ref, color='blue')
-        plt.scatter(x_aligned, y_aligned)
+        plt.scatter(x_ref, y_ref, color = 'indigo')
+        plt.scatter(x_aligned, y_aligned, color = 'dodgerblue')
         plt.draw()
 
         plt.pause(0.5)
